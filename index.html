@@ -38,6 +38,7 @@
   <body>
     <div id="hint">NEOSマーカーを映しながらタップするとメッセージが切り替わります</div>
 
+    <!-- A-Frame scene: embedded mode, no VR UI, AR.js mono marker, antialias on, iOS向けにデバイス方向UI無効 -->
     <a-scene
       embedded
       vr-mode-ui="enabled: false"
@@ -49,6 +50,7 @@
         <canvas id="text-canvas" width="1024" height="512"></canvas>
       </a-assets>
 
+      <!-- HIROマーカーを使用。独自マーカーの場合はtype="pattern" url="company-logo-marker.patt"に変更 -->
       <a-marker id="marker" type="hiro" emitevents="true">
         <a-entity position="0 0.6 0">
           <a-plane
@@ -66,7 +68,7 @@
     </a-scene>
 
     <script>
-      (function () {
+      (() => {
         const messages = [
           "NEOS Corp. ",
           "since 2000.03.31",
@@ -83,19 +85,22 @@
           "Thank you, President.",
           "Hello, Chairman.",
           "2025.11.30",
-
         ];
+
+        const state = {
+          index: 0,
+          animFrame: null,
+          lastTime: 0,
+          charIndex: 0,
+          charDelay: 45,
+        };
 
         const scene = document.querySelector("a-scene");
         const plane = document.getElementById("message-plane");
         const canvas = document.getElementById("text-canvas");
         const ctx = canvas.getContext("2d");
-        let index = 0;
-        let animFrame = null;
-        let lastTime = 0;
-        let charIndex = 0;
-        const charDelay = 45; // ms per character for a Famicom-like type effect
 
+        // 日本語も1文字ずつ測りながら折り返し。明示的な改行(\n)も許容。
         const wrapText = (value, maxWidth) => {
           const lines = [];
           let line = "";
@@ -118,6 +123,7 @@
           return lines;
         };
 
+        // キャンバス上に角丸矩形のパスを描く（塗り/枠のための下準備）。
         const drawRoundedRect = (x, y, w, h, r) => {
           const radius = Math.min(r, w / 2, h / 2);
           ctx.beginPath();
@@ -133,6 +139,7 @@
           ctx.closePath();
         };
 
+        // カード全体をキャンバスに描画し、プレーンのテクスチャとして使う。
         const drawCard = (textValue) => {
           const w = canvas.width;
           const h = canvas.height;
@@ -159,7 +166,8 @@
           ctx.fillStyle = "#f7f7f7";
           ctx.textAlign = "left";
           ctx.textBaseline = "middle";
-          ctx.font = "bold 64px 'Press Start 2P', 'M PLUS 1p', 'Noto Sans JP', 'Noto Sans CJK JP', 'Yu Gothic', 'Helvetica Neue', Arial, monospace";
+          ctx.font =
+            "bold 64px 'Press Start 2P', 'M PLUS 1p', 'Noto Sans JP', 'Noto Sans CJK JP', 'Yu Gothic', 'Helvetica Neue', Arial, monospace";
 
           const textBoxW = cardW * 0.82;
           const textStartX = (w - textBoxW) / 2;
@@ -176,33 +184,36 @@
           }
         };
 
+        // レトロ風のタイプライタ演出で左→右に文字を出していく。
         const animateMessage = () => {
-          if (animFrame) cancelAnimationFrame(animFrame);
-          charIndex = 0;
-          lastTime = 0;
+          if (state.animFrame) cancelAnimationFrame(state.animFrame);
+          state.charIndex = 0;
+          state.lastTime = 0;
 
           const step = (timestamp) => {
-            if (!lastTime) lastTime = timestamp;
-            const delta = timestamp - lastTime;
-            if (delta >= charDelay && charIndex < messages[index].length) {
-              charIndex += 1;
-              lastTime = timestamp;
+            if (!state.lastTime) state.lastTime = timestamp;
+            const delta = timestamp - state.lastTime;
+            if (delta >= state.charDelay && state.charIndex < messages[state.index].length) {
+              state.charIndex += 1;
+              state.lastTime = timestamp;
             }
-            const partial = messages[index].slice(0, charIndex);
+            const partial = messages[state.index].slice(0, state.charIndex);
             drawCard(partial);
-            if (charIndex < messages[index].length) {
-              animFrame = requestAnimationFrame(step);
+            if (state.charIndex < messages[state.index].length) {
+              state.animFrame = requestAnimationFrame(step);
             }
           };
 
-          animFrame = requestAnimationFrame(step);
+          state.animFrame = requestAnimationFrame(step);
         };
 
+        // 次のメッセージに進めてアニメーションをリスタート。
         const advanceMessage = () => {
-          index = (index + 1) % messages.length;
+          state.index = (state.index + 1) % messages.length;
           animateMessage();
         };
 
+        // タップ/クリックで次のメッセージへ。iOS対策でtouchstartも拾う。
         const attachListeners = () => {
           const handler = () => advanceMessage();
           const touchHandler = (event) => {
