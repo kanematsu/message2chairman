@@ -45,24 +45,20 @@
       arjs="sourceType: webcam; detectionMode: mono; debugUIEnabled: false;"
       device-orientation-permission-ui="enabled: false"
     >
+      <a-assets>
+        <canvas id="text-canvas" width="1024" height="512"></canvas>
+      </a-assets>
+
       <a-marker id="marker" type="hiro" emitevents="true">
         <a-entity position="0 0.6 0">
           <a-plane
             id="message-plane"
             width="3.2"
             height="1.6"
-            color="#ffde59"
-            opacity="0.92"
-            material="side: double; transparent: true"
+            material="src: #text-canvas; side: double; transparent: true"
             position="0 0 0"
             rotation="-20 0 0"
           ></a-plane>
-          <a-entity
-            id="message-text"
-            position="0 0 0.05"
-            rotation="-20 0 0"
-            text="value: ようこそ！マーカーに重ねて1枚目のメッセージです.; align: center; width: 2.8; wrapCount: 28; color: #111827; baseline: center; shader: msdf; side: double"
-          ></a-entity>
         </a-entity>
       </a-marker>
 
@@ -79,13 +75,51 @@
         ];
 
         const scene = document.querySelector("a-scene");
-        const text = document.getElementById("message-text");
+        const plane = document.getElementById("message-plane");
+        const canvas = document.getElementById("text-canvas");
+        const ctx = canvas.getContext("2d");
         let index = 0;
 
+        const wrapText = (value, maxWidth) => {
+          const lines = [];
+          let line = "";
+          for (const char of value) {
+            const testLine = line + char;
+            const width = ctx.measureText(testLine).width;
+            if (width > maxWidth && line !== "") {
+              lines.push(line);
+              line = char;
+            } else {
+              line = testLine;
+            }
+          }
+          if (line) lines.push(line);
+          return lines;
+        };
+
         const updateMessage = () => {
-          text.setAttribute("text", {
-            value: messages[index],
+          const w = canvas.width;
+          const h = canvas.height;
+          ctx.clearRect(0, 0, w, h);
+          ctx.fillStyle = "#ffde59";
+          ctx.fillRect(0, 0, w, h);
+
+          ctx.fillStyle = "#0a0a0a";
+          ctx.textAlign = "center";
+          ctx.textBaseline = "middle";
+          ctx.font = "bold 72px 'Hiragino Sans', 'Noto Sans JP', 'Noto Sans CJK JP', 'Yu Gothic', 'Helvetica Neue', Arial, sans-serif";
+
+          const lines = wrapText(messages[index], w * 0.8);
+          const lineHeight = 88;
+          const startY = h / 2 - ((lines.length - 1) * lineHeight) / 2;
+          lines.forEach((line, i) => {
+            ctx.fillText(line, w / 2, startY + i * lineHeight);
           });
+
+          const mesh = plane.getObject3D("mesh");
+          if (mesh && mesh.material && mesh.material.map) {
+            mesh.material.map.needsUpdate = true;
+          }
         };
 
         const advanceMessage = () => {
