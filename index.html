@@ -72,15 +72,20 @@
         <canvas id="text-canvas" width="1024" height="512"></canvas>
       </a-assets>
 
-      <a-marker id="marker" type="hiro" emitevents="true">
-        <a-entity position="0 0.6 0">
+      <a-marker
+        id="marker"
+        type="pattern"
+        url="company-logo-marker.patt"
+        emitevents="true"
+      >
+        <a-entity position="0 0.8 -0.25">
           <a-plane
             id="message-plane"
             width="3.2"
             height="1.6"
             material="src: #text-canvas; side: double; transparent: true"
             position="0 0 0"
-            rotation="-20 0 0"
+            rotation="-10 0 0"
           ></a-plane>
         </a-entity>
       </a-marker>
