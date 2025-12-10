@@ -97,19 +97,53 @@
           return lines;
         };
 
+        const drawRoundedRect = (x, y, w, h, r) => {
+          const radius = Math.min(r, w / 2, h / 2);
+          ctx.beginPath();
+          ctx.moveTo(x + radius, y);
+          ctx.lineTo(x + w - radius, y);
+          ctx.quadraticCurveTo(x + w, y, x + w, y + radius);
+          ctx.lineTo(x + w, y + h - radius);
+          ctx.quadraticCurveTo(x + w, y + h, x + w - radius, y + h);
+          ctx.lineTo(x + radius, y + h);
+          ctx.quadraticCurveTo(x, y + h, x, y + h - radius);
+          ctx.lineTo(x, y + radius);
+          ctx.quadraticCurveTo(x, y, x + radius, y);
+          ctx.closePath();
+        };
+
         const updateMessage = () => {
           const w = canvas.width;
           const h = canvas.height;
           ctx.clearRect(0, 0, w, h);
-          ctx.fillStyle = "#ffde59";
-          ctx.fillRect(0, 0, w, h);
+
+          const cardMargin = 36;
+          const cardW = w - cardMargin * 2;
+          const cardH = h - cardMargin * 2;
+
+          ctx.save();
+          ctx.shadowColor = "rgba(0, 0, 0, 0.25)";
+          ctx.shadowBlur = 28;
+          ctx.shadowOffsetY = 18;
+          drawRoundedRect(cardMargin, cardMargin, cardW, cardH, 42);
+          const gradient = ctx.createLinearGradient(0, 0, w, h);
+          gradient.addColorStop(0, "#ffe78a");
+          gradient.addColorStop(1, "#ffc35b");
+          ctx.fillStyle = gradient;
+          ctx.fill();
+          ctx.restore();
+
+          drawRoundedRect(cardMargin, cardMargin, cardW, cardH, 42);
+          ctx.strokeStyle = "rgba(0, 0, 0, 0.18)";
+          ctx.lineWidth = 6;
+          ctx.stroke();
 
           ctx.fillStyle = "#0a0a0a";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
           ctx.font = "bold 72px 'Hiragino Sans', 'Noto Sans JP', 'Noto Sans CJK JP', 'Yu Gothic', 'Helvetica Neue', Arial, sans-serif";
 
-          const lines = wrapText(messages[index], w * 0.8);
+          const lines = wrapText(messages[index], cardW * 0.82);
           const lineHeight = 88;
           const startY = h / 2 - ((lines.length - 1) * lineHeight) / 2;
           lines.forEach((line, i) => {
