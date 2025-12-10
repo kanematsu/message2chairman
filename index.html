@@ -18,6 +18,28 @@
         color: #e2e8f0;
       }
 
+      html,
+      body {
+        height: 100%;
+      }
+
+      a-scene {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 500vw;
+        height: 500vh;
+      }
+
+      #arjs-video {
+        position: fixed !important;
+        top: 0;
+        left: 0;
+        width: 500vw !important;
+        height: 500vh !important;
+        object-fit: cover;
+        z-index: -1;
+      }
       #hint {
         position: fixed;
         left: 50%;
@@ -49,20 +71,15 @@
         <canvas id="text-canvas" width="1024" height="512"></canvas>
       </a-assets>
 
-      <a-marker
-        id="marker"
-        type="pattern"
-        url="company-logo-marker.patt"
-        emitevents="true"
-      >
-        <a-entity position="0 0.8 -0.25">
+      <a-marker id="marker" type="hiro" emitevents="true">
+        <a-entity position="0 0.6 0">
           <a-plane
             id="message-plane"
             width="3.2"
             height="1.6"
             material="src: #text-canvas; side: double; transparent: true"
             position="0 0 0"
-            rotation="-10 0 0"
+            rotation="-20 0 0"
           ></a-plane>
         </a-entity>
       </a-marker>
