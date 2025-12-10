@@ -81,6 +81,10 @@
         const canvas = document.getElementById("text-canvas");
         const ctx = canvas.getContext("2d");
         let index = 0;
+        let animFrame = null;
+        let lastTime = 0;
+        let charIndex = 0;
+        const charDelay = 45; // ms per character for a Famicom-like type effect
 
         const wrapText = (value, maxWidth) => {
           const lines = [];
@@ -114,7 +118,7 @@
           ctx.closePath();
         };
 
-        const updateMessage = () => {
+        const drawCard = (textValue) => {
           const w = canvas.width;
           const h = canvas.height;
           ctx.clearRect(0, 0, w, h);
@@ -143,10 +147,10 @@
           ctx.fillStyle = "#1a1a1a";
           ctx.textAlign = "center";
           ctx.textBaseline = "middle";
-          ctx.font = "bold 72px 'Hiragino Sans', 'Noto Sans JP', 'Noto Sans CJK JP', 'Yu Gothic', 'Helvetica Neue', Arial, sans-serif";
+          ctx.font = "bold 64px 'Press Start 2P', 'M PLUS 1p', 'Noto Sans JP', 'Noto Sans CJK JP', 'Yu Gothic', 'Helvetica Neue', Arial, monospace";
 
-          const lines = wrapText(messages[index], cardW * 0.82);
-          const lineHeight = 88;
+          const lines = wrapText(textValue, cardW * 0.82);
+          const lineHeight = 80;
           const startY = h / 2 - ((lines.length - 1) * lineHeight) / 2;
           lines.forEach((line, i) => {
             ctx.fillText(line, w / 2, startY + i * lineHeight);
@@ -158,9 +162,31 @@
           }
         };
 
+        const animateMessage = () => {
+          if (animFrame) cancelAnimationFrame(animFrame);
+          charIndex = 0;
+          lastTime = 0;
+
+          const step = (timestamp) => {
+            if (!lastTime) lastTime = timestamp;
+            const delta = timestamp - lastTime;
+            if (delta >= charDelay && charIndex < messages[index].length) {
+              charIndex += 1;
+              lastTime = timestamp;
+            }
+            const partial = messages[index].slice(0, charIndex);
+            drawCard(partial);
+            if (charIndex < messages[index].length) {
+              animFrame = requestAnimationFrame(step);
+            }
+          };
+
+          animFrame = requestAnimationFrame(step);
+        };
+
         const advanceMessage = () => {
           index = (index + 1) % messages.length;
-          updateMessage();
+          animateMessage();
         };
 
         const attachListeners = () => {
@@ -174,11 +200,11 @@
         };
 
         if (scene.hasLoaded) {
-          updateMessage();
+          animateMessage();
           attachListeners();
         } else {
           scene.addEventListener("loaded", () => {
-            updateMessage();
+            animateMessage();
             attachListeners();
           });
         }
