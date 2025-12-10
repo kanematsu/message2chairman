@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <title>退任メッセージAR</title>
+
+  <!-- A-Frame & AR.js CDN -->
+  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/ar.js@3.4.6/aframe/build/aframe-ar.js"></script>
+
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
+    }
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      padding: 8px 12px;
+      background: rgba(0, 0, 0, 0.4);
+      color: #fff;
+      font-size: 14px;
+      z-index: 2;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div id="overlay">
+    カメラの許可を「許可」にして、<br>
+    配布したマーカーにかざしてください。
+  </div>
+
+  <!-- シーン定義 -->
+  <a-scene
+    embedded
+    vr-mode-ui="enabled: false"
+    renderer="logarithmicDepthBuffer: true; antialias: true"
+    arjs="sourceType: webcam; debugUIEnabled: false;"
+  >
+    <!-- ライト -->
+    <a-entity light="type: ambient; intensity: 0.8"></a-entity>
+    <a-entity light="type: directional; intensity: 0.6" position="1 1 0.5"></a-entity>
+
+    <!-- Hiroマーカーを使う（印刷して使用） -->
+    <a-marker type="hiro">
+      <!-- メッセージ（ここを書き換えればOK） -->
+      <a-entity
+        text="value: 長年のご尽力に\n心より感謝申し上げます;\ncolor: #ffffff; align: center; width: 2.5"
+        position="0 0.2 0"
+        rotation="-90 0 0"
+      ></a-entity>
+
+      <!-- ちょっとした台（マーカーの上に置いてる雰囲気） -->
+      <a-box position="0 0 0" rotation="-90 0 0" width="1" height="0.02" depth="0.6"
+             color="#202020" opacity="0.7"></a-box>
+    </a-marker>
+
+    <!-- マーカーが見えないときのカメラ -->
+    <a-entity camera></a-entity>
+  </a-scene>
+</body>
+</html>
