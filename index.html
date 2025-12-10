@@ -128,23 +128,20 @@
           const cardH = h - cardMargin * 2;
 
           ctx.save();
-          ctx.shadowColor = "rgba(0, 0, 0, 0.18)";
-          ctx.shadowBlur = 24;
+          ctx.shadowColor = "rgba(0, 0, 0, 0.35)";
+          ctx.shadowBlur = 20;
           ctx.shadowOffsetY = 16;
           drawRoundedRect(cardMargin, cardMargin, cardW, cardH, 42);
-          const gradient = ctx.createLinearGradient(0, 0, w, h);
-          gradient.addColorStop(0, "#fdfcf9");
-          gradient.addColorStop(1, "#f4f0e7");
-          ctx.fillStyle = gradient;
+          ctx.fillStyle = "#0a0a0a";
           ctx.fill();
           ctx.restore();
 
           drawRoundedRect(cardMargin, cardMargin, cardW, cardH, 42);
-          ctx.strokeStyle = "#caa45a";
-          ctx.lineWidth = 8;
+          ctx.strokeStyle = "#f6f7fb";
+          ctx.lineWidth = 10;
           ctx.stroke();
 
-          ctx.fillStyle = "#1a1a1a";
+          ctx.fillStyle = "#f7f7f7";
           ctx.textAlign = "left";
           ctx.textBaseline = "middle";
           ctx.font = "bold 64px 'Press Start 2P', 'M PLUS 1p', 'Noto Sans JP', 'Noto Sans CJK JP', 'Yu Gothic', 'Helvetica Neue', Arial, monospace";
