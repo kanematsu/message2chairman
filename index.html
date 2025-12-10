@@ -49,7 +49,12 @@
         <canvas id="text-canvas" width="1024" height="512"></canvas>
       </a-assets>
 
-      <a-marker id="marker" type="hiro" emitevents="true">
+      <a-marker
+        id="marker"
+        type="pattern"
+        url="company-logo-marker.patt"
+        emitevents="true"
+      >
         <a-entity position="0 0.6 0">
           <a-plane
             id="message-plane"
