@@ -1,151 +1,27 @@
 <!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="utf-8">
-  <title>退任記念ARメッセージ</title>
-
-  <!-- A-Frame & AR.js -->
-  <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
-  <script src="https://cdn.jsdelivr.net/npm/ar.js@3.4.6/aframe/build/aframe-ar.js"></script>
-
-  <style>
-    body {
-      margin: 0;
-      overflow: hidden;
-      font-family: system-ui, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-    }
-    #overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      right: 0;
-      padding: 8px 12px;
-      background: rgba(0, 0, 0, 0.5);
-      color: #fff;
-      font-size: 13px;
-      z-index: 2;
-      text-align: center;
-    }
-  </style>
-</head>
-<body>
-  <div id="overlay">
-    カメラの許可を「許可」にして、<br>
-    会社ロゴのマーカーにスマホをかざしてください。<br>
-    画面をタップするとメッセージが切り替わります。
-  </div>
-
-  <a-scene
-    embedded
-    vr-mode-ui="enabled: false"
-    renderer="logarithmicDepthBuffer: true; antialias: true"
-    arjs="sourceType: webcam; facingMode: environment; debugUIEnabled: false;"
-  >
-    <!-- 環境光・方向光 -->
-    <a-entity light="type: ambient; intensity: 0.9"></a-entity>
-    <a-entity light="type: directional; intensity: 0.7" position="1 2 1"></a-entity>
-
-    <!-- ▼ 会社ロゴのオリジナル画像マーカー ▼
-         下記 url="company-logo-marker.patt" は
-         ロゴから生成した .patt ファイルへのパスに変更してください
-    -->
-    <a-marker
-      type="pattern"
-      url="company-logo-marker.patt"
-      id="logoMarker"
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>AR.js Test</title>
+    <script src="https://aframe.io/releases/1.5.0/aframe.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/ar.js@3.4.6/aframe/build/aframe-ar.js"></script>
+    <style>
+      body { margin: 0; overflow: hidden; }
+    </style>
+  </head>
+  <body>
+    <a-scene
+      embedded
+      vr-mode-ui="enabled: false"
+      renderer="logarithmicDepthBuffer: true; antialias: true"
+      arjs="sourceType: webcam; debugUIEnabled: true;"
     >
-      <!-- タイトル（社長名 + 日付） -->
-      <a-entity
-        id="titleText"
-        text="value: President Naoki / 2025.12.12; color: #FFD700; align: center; width: 3"
-        position="0 0.8 0"
-        rotation="-90 0 0"
-      ></a-entity>
+      <!-- まずはHIROマーカーで確認 -->
+      <a-marker type="hiro">
+        <a-box position="0 0.5 0" rotation="0 45 0" color="red"></a-box>
+      </a-marker>
 
-      <!-- メインメッセージ（タップで中身が変わる） -->
-      <a-entity
-        id="messageText"
-        text="value: 長年のご尽力に\n心より感謝申し上げます; color: #FFFFFF; align: center; width: 3"
-        position="0 0.4 0"
-        rotation="-90 0 0"
-      ></a-entity>
-
-      <!-- ロゴ画像（PNGなど） -->
-      <!-- src="logo.png" を実際のロゴ画像パスに変更 -->
-      <a-image
-        id="logoImage"
-        src="logo.png"
-        width="1.2"
-        height="0.4"
-        position="0 0.05 0.01"
-        rotation="-90 0 0"
-      ></a-image>
-
-      <!-- ロゴの下にうっすら台座 -->
-      <a-box
-        position="0 0 0"
-        rotation="-90 0 0"
-        width="1.6"
-        height="0.02"
-        depth="0.8"
-        color="#202020"
-        opacity="0.6"
-      ></a-box>
-
-      <!-- 3Dの輪っか（指輪のようなトーラス） -->
-      <a-torus
-        id="ring"
-        radius="0.65"
-        radius-tubular="0.04"
-        color="#FFD700"
-        position="0 0.2 0"
-        rotation="-90 0 0"
-        segments-radial="16"
-        segments-tubular="48"
-        material="metalness: 0.8; roughness: 0.2"
-      ></a-torus>
-
-    </a-marker>
-
-    <!-- カメラ -->
-    <a-entity camera></a-entity>
-  </a-scene>
-
-  <script>
-    // ▼ 切り替えたいメッセージ4つをここに定義 ▼
-    const messages = [
-      "長年のご尽力に\n心より感謝申し上げます。",
-      "いつも温かいご指導を\n本当にありがとうございました。",
-      "新しいステージでの\nますますのご活躍をお祈りいたします。",
-      "どうかお身体に気をつけて\nこれからもお元気でお過ごしください。"
-    ];
-
-    let currentIndex = 0;
-
-    window.addEventListener('load', () => {
-      const sceneEl = document.querySelector('a-scene');
-      const messageEl = document.getElementById('messageText');
-
-      function updateMessage() {
-        const text = messages[currentIndex];
-        messageEl.setAttribute('text', 'value', text);
-      }
-
-      // 初期表示
-      updateMessage();
-
-      // 画面タップでメッセージ切り替え
-      sceneEl.addEventListener('click', () => {
-        currentIndex = (currentIndex + 1) % messages.length;
-        updateMessage();
-      });
-
-      // スマホでのタップにも反応させる（念のため）
-      sceneEl.addEventListener('touchstart', () => {
-        currentIndex = (currentIndex + 1) % messages.length;
-        updateMessage();
-      });
-    });
-  </script>
-</body>
+      <a-entity camera></a-entity>
+    </a-scene>
+  </body>
 </html>
