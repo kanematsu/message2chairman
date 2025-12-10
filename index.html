@@ -59,9 +59,9 @@
           ></a-plane>
           <a-entity
             id="message-text"
-            position="0 0 0.02"
+            position="0 0 0.05"
             rotation="-20 0 0"
-            text="value:; align: center; width: 2.6; color: #0b1220; wrapCount: 26"
+            text="value: ようこそ！マーカーに重ねて1枚目のメッセージです.; align: center; width: 2.8; wrapCount: 28; color: #0b1220; baseline: center; shader: msdf; side: double"
           ></a-entity>
         </a-entity>
       </a-marker>
@@ -83,7 +83,9 @@
         let index = 0;
 
         const updateMessage = () => {
-          text.setAttribute("text", "value", messages[index]);
+          text.setAttribute("text", {
+            value: messages[index],
+          });
         };
 
         const advanceMessage = () => {
