@@ -145,15 +145,17 @@
           ctx.stroke();
 
           ctx.fillStyle = "#1a1a1a";
-          ctx.textAlign = "center";
+          ctx.textAlign = "left";
           ctx.textBaseline = "middle";
           ctx.font = "bold 64px 'Press Start 2P', 'M PLUS 1p', 'Noto Sans JP', 'Noto Sans CJK JP', 'Yu Gothic', 'Helvetica Neue', Arial, monospace";
 
-          const lines = wrapText(textValue, cardW * 0.82);
+          const textBoxW = cardW * 0.82;
+          const textStartX = (w - textBoxW) / 2;
+          const lines = wrapText(textValue, textBoxW);
           const lineHeight = 80;
           const startY = h / 2 - ((lines.length - 1) * lineHeight) / 2;
           lines.forEach((line, i) => {
-            ctx.fillText(line, w / 2, startY + i * lineHeight);
+            ctx.fillText(line, textStartX, startY + i * lineHeight);
           });
 
           const mesh = plane.getObject3D("mesh");
